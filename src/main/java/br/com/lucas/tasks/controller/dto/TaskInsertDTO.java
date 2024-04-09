@@ -1,22 +1,21 @@
 package br.com.lucas.tasks.controller.dto;
 
-import br.com.lucas.tasks.model.TaskState;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.Range;
 
-public class TaskDTO {
+public class TaskInsertDTO {
 
-    private String id;
+    @NotBlank(message = "{blank.title}")
+    @Size(min = 3, max = 20, message = "{size.title}")
     private String title;
+
+    @NotBlank(message = "{blank.description}")
+    @Size(min = 10, max = 50, message = "{size.description}")
     private String description;
+
+    @Range(min = 1, message = "{range.priority}")
     private int priority;
-    private TaskState state;
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getId(){
-        return id;
-    }
 
     public String getTitle() {
         return title;
@@ -40,14 +39,6 @@ public class TaskDTO {
 
     public void setPriority(int priority) {
         this.priority = priority;
-    }
-
-    public TaskState getState() {
-        return state;
-    }
-
-    public void setState(TaskState state) {
-        this.state = state;
     }
 
 }

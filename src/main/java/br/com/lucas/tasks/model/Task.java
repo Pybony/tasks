@@ -52,7 +52,16 @@ public class Task {
     }
 
     public Task insert() {
-        return builderFrom(this).withState(TaskState.INSERT).build();
+        return builderFrom(this)
+                .withState(TaskState.INSERT)
+                .build();
+    }
+
+    public Task update(Task oldTask) {
+        return builderFrom(this)
+                .withId(oldTask.getId())
+                .withState(oldTask.getState())
+                .build();
     }
 
     public static class Builder {

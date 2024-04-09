@@ -5,8 +5,6 @@ import br.com.lucas.tasks.model.Task;
 import br.com.lucas.tasks.model.TaskState;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Component

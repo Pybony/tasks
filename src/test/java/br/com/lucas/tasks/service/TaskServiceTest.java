@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,7 +35,7 @@ public class TaskServiceTest {
     void service_mustReturnTask_whenInsertSucessfully() {
         Task task = TestUtils.buildValidTask();
 
-        when(repository.save(any())).thenReturn(task);
+        when(repository.save(any())).thenReturn(Mono.just(task));
 
         create(service.insert(task))
                 .then(() -> verify(repository, times(1))
@@ -46,9 +47,12 @@ public class TaskServiceTest {
 
     @Test
     void service_mustReturnVoid_whenDeleteTaskSucessfully() {
+        when(repository.deleteById(anyString()))
+                .thenReturn(Mono.empty());
+
         create(service.deleteById("someId"))
                 .then(() -> verify(repository, times(1))
-                        .deleteById(any()))
+                        .deleteById(anyString()))
                 .expectComplete();
     }
 
@@ -57,9 +61,9 @@ public class TaskServiceTest {
         Task task = TestUtils.buildValidTask();
 
         when(customRepository.findPaginated(any(), anyInt(), anyInt()))
-                .thenReturn(Page.empty());
+                .thenReturn(Mono.just(Page.empty()));
 
-        Page<Task> result = service.findPaginated(task, 0, 10);
+        Mono<Page<Task>> result = service.findPaginated(task, 0, 10);
 
         assertNotNull(result);
 

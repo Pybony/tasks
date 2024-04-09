@@ -1,7 +1,9 @@
 package br.com.lucas.tasks.controller;
 
 import br.com.lucas.tasks.controller.converter.TaskConverter;
+import br.com.lucas.tasks.controller.converter.TaskInsertDTOConverter;
 import br.com.lucas.tasks.controller.dto.TaskDTO;
+import br.com.lucas.tasks.controller.dto.TaskInsertDTO;
 import br.com.lucas.tasks.model.Task;
 import br.com.lucas.tasks.service.TaskService;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,9 @@ public class TaskControllerTest {
     @Mock
     private TaskConverter converter;
 
+    @Mock
+    private TaskInsertDTOConverter insertDTOConverter;
+
     @Test
     public void controller_mustReturnOK_whenSaveSucessfully() {
         when(converter.convert(any(Task.class)))
@@ -39,7 +44,7 @@ public class TaskControllerTest {
 
         client.post()
                 .uri("/task")
-                .bodyValue(new TaskDTO())
+                .bodyValue(new TaskInsertDTO())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TaskDTO.class);
@@ -63,7 +68,7 @@ public class TaskControllerTest {
     @Test
     public void controller_mustReturnOK_whenFindSucessfully() {
         when(service.findPaginated(any(), anyInt(), anyInt()))
-                .thenReturn(Page.empty());
+                .thenReturn(Mono.just(Page.empty()));
 
         WebTestClient client = WebTestClient.bindToController(controller).build();
 
