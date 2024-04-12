@@ -1,7 +1,8 @@
 package br.com.lucas.tasks.service;
 
-import br.com.lucas.tasks.controller.dto.TaskUpdateDTO;
 import br.com.lucas.tasks.exception.TaskNotFoundException;
+import br.com.lucas.tasks.message.TaskNotificationProducer;
+import br.com.lucas.tasks.model.Address;
 import br.com.lucas.tasks.model.Task;
 import br.com.lucas.tasks.repository.TaskCustomRepository;
 import br.com.lucas.tasks.repository.TaskRepository;
@@ -17,10 +18,14 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskCustomRepository taskCustomRepository;
+    private final AddressService addressService;
+    private final TaskNotificationProducer producer;
 
-    public TaskService(TaskRepository taskRepository, TaskCustomRepository taskCustomRepository) {
+    public TaskService(TaskRepository taskRepository, TaskCustomRepository taskCustomRepository, AddressService addressService, TaskNotificationProducer producer) {
         this.taskRepository = taskRepository;
         this.taskCustomRepository = taskCustomRepository;
+        this.addressService = addressService;
+        this.producer = producer;
     }
 
     public Mono<Task> insert(Task task) {
@@ -44,6 +49,22 @@ public class TaskService {
 
     public Mono<Void> deleteById(String id) {
         return taskRepository.deleteById(id);
+    }
+
+    public Mono<Task> start(String id, String zipcode) {
+        return taskRepository.findById(id)
+                .zipWhen(it -> addressService.getAddress(zipcode))
+                .flatMap(it -> updateAddress(it.getT1(), it.getT2()))
+                .map(Task::start)
+                .flatMap(taskRepository::save)
+                .flatMap(producer::sendNotification)
+                .switchIfEmpty(Mono.error(TaskNotFoundException::new))
+                .doOnError(error -> LOGGER.error("Error on start task. ID: {}", id, error));
+    }
+
+    private Mono<Task> updateAddress(Task task, Address address) {
+        return Mono.just(task)
+                .map(it -> task.updateAddress(address));
     }
 
     private Mono<Task> save(Task task) {

@@ -19,6 +19,7 @@ public class TaskConverter {
                     dto.setDescription(source.getDescription());
                     dto.setPriority(source.getPriority());
                     dto.setState(source.getState());
+                    dto.setAddress(source.getAddress());
                     return dto;
                 })
                 .orElse(null);
