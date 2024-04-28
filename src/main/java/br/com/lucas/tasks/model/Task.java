@@ -1,7 +1,8 @@
 package br.com.lucas.tasks.model;
 
-import br.com.lucas.tasks.service.TaskService;
 import org.springframework.data.annotation.Id;
+
+import java.time.LocalDate;
 
 public class Task {
 
@@ -12,6 +13,7 @@ public class Task {
     private int priority;
     private TaskState state;
     private Address address;
+    private LocalDate created;
 
     public Task() {
     }
@@ -23,6 +25,7 @@ public class Task {
         this.priority = builder.priority;
         this.state = builder.state;
         this.address = builder.address;
+        this.created = builder.created;
     }
 
     public String getId() {
@@ -49,6 +52,14 @@ public class Task {
         return address;
     }
 
+    public LocalDate getCreated() {
+        return created;
+    }
+
+    public void setCreated(LocalDate created) {
+        this.created = created;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -60,6 +71,7 @@ public class Task {
     public Task insert() {
         return builderFrom(this)
                 .withState(TaskState.INSERT)
+                .withCreated(LocalDate.now())
                 .build();
     }
 
@@ -82,6 +94,30 @@ public class Task {
                 .build();
     }
 
+    public Task done() {
+        return builderFrom(this)
+                .withState(TaskState.DONE)
+                .build();
+    }
+
+    public boolean createdIsEmpty() {
+        return this.created == null;
+    }
+
+    public boolean isvalidState() {
+        return this.state != null;
+    }
+
+    public boolean isvalidPriority() {
+        return this.priority > 0;
+    }
+
+    public Task createdNow() {
+        return Task.builderFrom(this)
+                .withCreated(LocalDate.now())
+                .build();
+    }
+
     public static class Builder {
         private String id;
         private String title;
@@ -89,6 +125,7 @@ public class Task {
         private int priority;
         private TaskState state;
         private Address address;
+        private LocalDate created;
 
         public Builder() {
         }
@@ -100,6 +137,7 @@ public class Task {
             this.priority = task.priority;
             this.state = task.state;
             this.address = task.address;
+            this.created = task.created;
         }
 
         public Builder withId(String id) {
@@ -129,6 +167,11 @@ public class Task {
 
         public Builder withAddress(Address address) {
             this.address = address;
+            return this;
+        }
+
+        public Builder withCreated(LocalDate created) {
+            this.created = created;
             return this;
         }
 

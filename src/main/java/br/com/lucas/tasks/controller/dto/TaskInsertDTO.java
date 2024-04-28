@@ -14,7 +14,7 @@ public class TaskInsertDTO {
     @Size(min = 10, max = 50, message = "{size.description}")
     private String description;
 
-    @Range(min = 1, message = "{range.priority}")
+    @Range(min = 1, message = "$range.priority}")
     private int priority;
 
     public String getTitle() {

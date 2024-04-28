@@ -10,7 +10,7 @@ public class TaskUpdateDTO {
     private String id;
 
     @NotBlank(message = "{blank.title}")
-    @Size(min = 3, max = 20, message = "{size.title}")
+    @Size(min = 3, max = 20, message = "${size.title}")
     private String title;
 
     @NotBlank(message = "{blank.description}")

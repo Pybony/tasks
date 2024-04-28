@@ -10,7 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TaskService {
@@ -62,6 +66,29 @@ public class TaskService {
                 .doOnError(error -> LOGGER.error("Error on start task. ID: {}", id, error));
     }
 
+    public Mono<Task> done(Task task) {
+        return Mono.just(task)
+                .doOnNext(it -> LOGGER.info("Finishing task. ID:{}", task.getId()))
+                .map(Task::done)
+                .flatMap(taskRepository::save);
+    }
+
+    public Mono<List<Task>> doneMany(List<String> ids) {
+        return Flux.fromIterable(ids)
+                .flatMap(id -> taskRepository.findById(id)
+                        .map(Task::done)
+                        .flatMap(taskRepository::save))
+                .doOnNext(it -> LOGGER.info("Done task. ID: {}", it.getId()))
+                .collectList();
+    }
+
+    public Flux<Task> refreshCreated() {
+        return taskRepository.findAll()
+                .filter(Task::createdIsEmpty)
+                .map(Task::createdNow)
+                .flatMap(taskRepository::save);
+    }
+
     private Mono<Task> updateAddress(Task task, Address address) {
         return Mono.just(task)
                 .map(it -> task.updateAddress(address));
@@ -72,5 +99,7 @@ public class TaskService {
                 .doOnNext(t -> LOGGER.info("Saving task with title {}", t.getTitle()))
                 .flatMap(taskRepository::save);
     }
+
+
 
 }

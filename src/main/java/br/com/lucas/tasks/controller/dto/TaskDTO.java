@@ -2,7 +2,11 @@ package br.com.lucas.tasks.controller.dto;
 
 import br.com.lucas.tasks.model.Address;
 import br.com.lucas.tasks.model.TaskState;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.time.LocalDate;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskDTO {
 
     private String id;
@@ -11,6 +15,7 @@ public class TaskDTO {
     private int priority;
     private TaskState state;
     private Address address;
+    private LocalDate created;
 
     public void setId(String id) {
         this.id = id;
@@ -42,6 +47,14 @@ public class TaskDTO {
 
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+
+    public LocalDate getCreated() {
+        return created;
+    }
+
+    public void setCreated(LocalDate created) {
+        this.created = created;
     }
 
     public TaskState getState() {
